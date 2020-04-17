@@ -1,29 +1,44 @@
-'use strict';
-var __importDefault = (this && this.__importDefault) || function (mod) {
-  return (mod && mod.__esModule) ? mod : { default: mod };
-};
-Object.defineProperty(exports, '__esModule', { value: true });
-var express_1 = __importDefault(require('express'));
+import express, { Request, Response } from 'express';
 // const express = require('express');
-var app = express_1.default();
-var port = process.env.API_PORT || 3000;
-var todos = [];
-var users = [];
-var todoIndex = 0;
-var idIncrement = 0;
-var todoReadHandler = function (req, res) {
+const app = express();
+const port = process.env.API_PORT || 3000;
+
+interface Todo {
+  id: number;
+  name: string;
+  description: string;
+  status: 'new' | 'in-progress' | 'done';
+  authorID: number
+}
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: 'admin' | 'user';
+  password: string
+}
+
+const todos: Array<Todo> = [];
+const users: Array<User>  = [];
+let todoIndex: number = 0;
+let idIncrement: number = 0;
+
+const todoReadHandler = (req: Request, res: Response) => {
   res.json(todos);
 };
-var todoReadByIdHandler = function (req, res) {
-  for (var i = 0; i < todos.length; i++) {
+
+const todoReadByIdHandler = (req: Request, res: Response) => {
+  for (let i = 0; i < todos.length; i++) {
     if (todos[i].id === parseInt(req.params.id)) {
       return res.json(todos[i]);
     }
   }
   res.send('Non existing ID!');
 };
-var todoUpdateHandler = function (req, res) {
-  for (var i = 0; i < todos.length; i++) {
+
+const todoUpdateHandler = (req: Request, res: Response) => {
+  for (let i = 0; i < todos.length; i++) {
     if (todos[i].id === parseInt(req.params.id)) {
       console.log(req.body);
       todos[i].name = req.body.name;
@@ -34,8 +49,9 @@ var todoUpdateHandler = function (req, res) {
   }
   res.send('Non existing ID!');
 };
-var todoCreateHandler = function (req, res) {
-  var todo = {
+
+const todoCreateHandler = (req: Request, res: Response) => {
+  const todo: Todo = {
     id: todoIndex,
     name: req.body.name,
     description: req.body.description,
@@ -46,8 +62,9 @@ var todoCreateHandler = function (req, res) {
   todoIndex++;
   res.status(201).json(todo);
 };
-var todoDeleteHandler = function (req, res) {
-  for (var i = 0; i < todos.length; i++) {
+
+const todoDeleteHandler = (req: Request, res: Response) => {
+  for (let i = 0; i < todos.length; i++) {
     if (todos[i].id === parseInt(req.params.id)) {
       todos.splice(i, 1);
       return res.sendStatus(204);
@@ -55,8 +72,9 @@ var todoDeleteHandler = function (req, res) {
   }
   res.send('Non existing ID!');
 };
-var userCreateHandler = function (req, res) {
-  var user = {
+
+const userCreateHandler = (req: Request, res: Response) => {
+  const user = {
     id: idIncrement,
     username: req.body.username,
     email: req.body.email,
@@ -67,17 +85,17 @@ var userCreateHandler = function (req, res) {
   idIncrement++;
   res.status(201).json(user);
 };
-var userReadHandler = function (req, res) {
-  for (var _i = 0, users_1 = users; _i < users_1.length; _i++) {
-    var user = users_1[_i];
+
+const userReadHandler = (req: Request, res: Response) => {
+  for (const user of users) {
     if (user.id === parseInt(req.params.id)) {
       return res.json(user);
     }
   }
 };
-var userUpdateHandler = function (req, res) {
-  for (var _i = 0, users_2 = users; _i < users_2.length; _i++) {
-    var user = users_2[_i];
+
+const userUpdateHandler = (req: Request, res: Response) => {
+  for (const user of users) {
     if (user.id === parseInt(req.params.id)) {
       user.username = req.body.username;
       user.email = req.body.email;
@@ -87,8 +105,9 @@ var userUpdateHandler = function (req, res) {
     }
   }
 };
-var userDeleteHandler = function (req, res) {
-  for (var i = 0; i < users.length; i++) {
+
+const userDeleteHandler = (req: Request, res: Response) => {
+  for (let i = 0; i < users.length; i++) {
     if (users[i].id === parseInt(req.params.id)) {
       users.splice(i, 1);
       return res.sendStatus(204);
@@ -96,7 +115,8 @@ var userDeleteHandler = function (req, res) {
   }
   res.send('Non existing ID!');
 };
-app.use(express_1.default.json());
+
+app.use(express.json());
 app.get('/todos', todoReadHandler);
 app.post('/todos', todoCreateHandler);
 app.get('/todos/:id', todoReadByIdHandler);
@@ -106,4 +126,5 @@ app.get('/user/:id', userReadHandler);
 app.post('/user', userCreateHandler);
 app.put('/user/:id', userUpdateHandler);
 app.delete('/user/:id', userDeleteHandler);
-app.listen(port, function () { console.log("I'm listening on " + port); });
+
+app.listen(port, () => { console.log(`I'm listening on ${port}` )});

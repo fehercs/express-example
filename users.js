@@ -36,3 +36,19 @@ const updateHandler = (req, res) => {
     }
   }
 };
+
+const deleteHandler = (req, res) => {
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].id === parseInt(req.params.id)) {
+      users.splice(i, 1);
+      return res.sendStatus(204);
+    }
+  }
+  res.send('Non existing ID!');
+};
+
+app.use(express.json());
+app.get('user/:id', readHandler());
+app.post('user/:id', createHandler());
+app.put('user/:id', updateHandler());
+app.delete('user/:id', deleteHandler());
