@@ -89,9 +89,11 @@ const userCreateHandler = (req: Request, res: Response) => {
 const userReadHandler = (req: Request, res: Response) => {
   for (const user of users) {
     if (user.id === parseInt(req.params.id)) {
+      delete user.password;
       return res.json(user);
     }
   }
+  res.send({});
 };
 
 const userUpdateHandler = (req: Request, res: Response) => {
@@ -99,11 +101,10 @@ const userUpdateHandler = (req: Request, res: Response) => {
     if (user.id === parseInt(req.params.id)) {
       user.username = req.body.username;
       user.email = req.body.email;
-      user.role = req.body.role;
-      user.password = req.body.password;
       return res.status(203).json(user);
     }
   }
+  res.send({});
 };
 
 const userDeleteHandler = (req: Request, res: Response) => {
